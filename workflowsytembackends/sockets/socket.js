@@ -6,9 +6,14 @@ function init(server) {
     require("socket.io")
 
   io = new Server(server, {
-    cors: {
-      origin: "*"
-    }
+     cors: {
+
+    origin:
+      "http://localhost:5173",
+
+    methods:
+      ["GET", "POST"]
+  }
   })
 
   io.on("connection", socket => {

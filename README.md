@@ -1,126 +1,195 @@
+<div align="center">
+
+<img src="YOUR_LOGO_URL" width="120"/>
+
 # WorkflowX Backend
 
-Backend server for the Collaborative Workflow Orchestration System.
+### Collaborative Workflow Orchestration System Backend
+
+<p>
+Advanced workflow engine backend built using Node.js, Express.js, MongoDB, Socket.IO, and graph-based execution planning.
+</p>
+
+<br/>
+
+<img src="https://img.shields.io/badge/Node.js-Backend-green?style=for-the-badge&logo=node.js"/>
+<img src="https://img.shields.io/badge/Express.js-API-black?style=for-the-badge&logo=express"/>
+<img src="https://img.shields.io/badge/MongoDB-Database-green?style=for-the-badge&logo=mongodb"/>
+<img src="https://img.shields.io/badge/Socket.IO-Realtime-black?style=for-the-badge&logo=socketdotio"/>
+<img src="https://img.shields.io/badge/JWT-Authentication-blue?style=for-the-badge&logo=jsonwebtokens"/>
+
+<br/>
+<br/>
+
+<a href="YOUR_RENDER_LINK">
+  <img src="https://img.shields.io/badge/Live_API-Render-46E3B7?style=for-the-badge&logo=render"/>
+</a>
+
+<a href="YOUR_GITHUB_LINK">
+  <img src="https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github"/>
+</a>
+
+</div>
 
 ---
 
-# Overview
+# Project Introduction
 
-This backend provides APIs and workflow engine logic for collaborative project and task management.
+WorkflowX is a collaborative workflow orchestration backend designed to manage complex project execution with dependency-aware task scheduling, realtime collaboration, concurrency handling, and workflow simulation.
 
-It supports:
+Unlike basic CRUD systems, this backend implements workflow engine concepts using graph algorithms and realtime event-driven architecture.
 
-* authentication
-* project collaboration
-* task dependency management
-* execution planning
+The system supports:
+
+* dependency-aware task execution
 * realtime synchronization
 * optimistic concurrency control
-* retry handling
+* retry mechanisms
 * workflow simulation
+* resource locking
+* audit logging
+* webhook integrations
+
+---
+
+# Core Features
+
+## Authentication & Security
+
+* JWT Authentication
+* bcrypt password hashing
+* Protected APIs
+* Secure invite token system
+* Validation middleware
+* Access control middleware
+
+---
+
+## Project Collaboration
+
+* Create projects
+* Invite collaborators
+* Join using secure invite links
+* Shared project workspace
+
+---
+
+## Advanced Task Management
+
+* Create/update/delete tasks
+* Task retry system
+* Version history tracking
+* Task dependency handling
+* Task status lifecycle
+
+---
+
+## Workflow Engine
+
+* Dependency graph validation
+* Cycle detection using DFS
+* Topological sorting
+* Execution planning engine
+* Daily workflow simulation
+
+---
+
+## Realtime Communication
+
+Implemented using Socket.IO.
+
+Realtime events:
+
+* task-created
+* task-updated
+* retry-attempted
+
+---
+
+## Concurrency Handling
+
+Optimistic concurrency control prevents stale updates when multiple users edit tasks simultaneously.
+
+Each task contains:
+
+* versionNumber
+* history tracking
+
+---
+
+## Resource Locking
+
+Two running tasks cannot use the same resource simultaneously.
+
+Example:
+
+```text
+Task A → resourceTag = database
+Task B → resourceTag = database
+```
+
+If Task A is running:
+
+* Task B cannot start.
 
 ---
 
 # Tech Stack
 
-* Node.js
-* Express.js
-* MongoDB
-* Mongoose
-* JWT Authentication
-* Socket.IO
-* bcrypt
-* Jest
+| Technology | Purpose                |
+| ---------- | ---------------------- |
+| Node.js    | Backend Runtime        |
+| Express.js | REST APIs              |
+| MongoDB    | Database               |
+| Mongoose   | ODM                    |
+| JWT        | Authentication         |
+| Socket.IO  | Realtime Communication |
+| bcrypt     | Password Hashing       |
+| Jest       | Testing                |
 
 ---
 
-# Features
+# Backend Architecture
 
-## Authentication
-
-* User signup
-* User login
-* JWT token authentication
-* Password hashing using bcrypt
-
-## Project Management
-
-* Create projects
-* Invite collaborators
-* Join project using invite token
-
-## Task Management
-
-* Create tasks
-* Edit tasks
-* Retry failed tasks
-* Task history tracking
-* Task status updates
-
-## Workflow Engine
-
-* Dependency-aware execution planning
-* Cycle detection
-* Resource locking
-* Retry mechanism
-* Daily simulation engine
-
-## Realtime Features
-
-* Live task updates using Socket.IO
-* Instant synchronization across users
-
-## Security
-
-* Protected APIs
-* Access middleware
-* Invite token expiration
-* Environment variables
-
-## Additional Features
-
-* Webhook integration
-* Audit logging
-* Validation middleware
-* Error handling middleware
-
----
-
-# Installation
-
-## Clone Repository
-
-```bash
-git clone <repository_url>
+```text
+Client
+  ↓
+Express APIs
+  ↓
+Controllers
+  ↓
+Services Layer
+  ↓
+MongoDB
+  ↓
+Socket.IO Events
 ```
 
 ---
 
-# Install Dependencies
+# Graph Algorithms Used
 
-```bash
-npm install
-```
+## DFS Traversal
 
----
+Used for:
 
-# Environment Variables
+* dependency cycle detection
 
-Create `.env`
+## Topological Sorting
 
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection
-JWT_SECRET=your_secret_key
-```
+Used for:
 
----
+* execution planning
 
-# Run Development Server
+## Greedy Scheduling
 
-```bash
-npm run dev
-```
+Used for:
+
+* daily workflow simulation
+
+Time Complexity:
+
+O(V + E)
 
 ---
 
@@ -142,9 +211,47 @@ backend/
 
 ---
 
+# Installation
+
+## Clone Repository
+
+```bash
+git clone YOUR_GITHUB_LINK
+```
+
+---
+
+# Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+# Environment Variables
+
+Create `.env`
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_secret_key
+```
+
+---
+
+# Run Development Server
+
+```bash
+npm run dev
+```
+
+---
+
 # Main APIs
 
-## Authentication APIs
+## Authentication
 
 ```http
 POST /api/auth/signup
@@ -153,7 +260,7 @@ POST /api/auth/login
 
 ---
 
-## Project APIs
+## Projects
 
 ```http
 GET /api/projects
@@ -164,7 +271,7 @@ POST /api/projects/join
 
 ---
 
-## Task APIs
+## Tasks
 
 ```http
 POST /api/tasks
@@ -175,7 +282,7 @@ GET /api/tasks/:id/history
 
 ---
 
-## Workflow APIs
+## Workflow Engine
 
 ### Compute Execution Plan
 
@@ -191,70 +298,6 @@ POST /api/projects/:projectId/simulate
 
 ---
 
-# Core Concepts Used
-
-## Graph Algorithms
-
-Tasks are represented as graph nodes.
-
-## DFS Traversal
-
-Used for dependency cycle detection.
-
-## Topological Sorting
-
-Used for execution planning.
-
-## Greedy Scheduling
-
-Used in daily simulation engine.
-
----
-
-# Optimistic Concurrency Control
-
-Each task contains a version number.
-
-Before updating:
-
-* frontend sends current version
-* backend compares latest version
-
-If versions mismatch:
-
-* update rejected
-
-This prevents stale updates.
-
----
-
-# Resource Locking
-
-Two running tasks cannot use the same resource simultaneously.
-
-Example:
-
-```text
-Task A → resourceTag = database
-Task B → resourceTag = database
-```
-
-If Task A is running:
-
-* Task B cannot start.
-
----
-
-# Realtime Communication
-
-Socket.IO events:
-
-* task-created
-* task-updated
-* retry-attempted
-
----
-
 # Testing
 
 Run tests:
@@ -267,10 +310,13 @@ npm test
 
 # Deployment
 
-Recommended:
+## Backend Deployment
 
-* Backend → Render
-* Database → MongoDB Atlas
+Deployed on Render.
+
+## Database
+
+MongoDB Atlas
 
 ---
 
@@ -278,13 +324,28 @@ Recommended:
 
 * Redis queue support
 * Background workers
-* Role-based access control
 * Docker support
 * Kubernetes deployment
-* Notification system
+* Notification service
+* Advanced scheduling algorithms
+
+---
+
+# Learning Outcomes
+
+This project helped improve understanding of:
+
+* MERN stack development
+* backend architecture
+* realtime systems
+* graph algorithms
+* concurrency handling
+* workflow engine design
 
 ---
 
 # Author
 
-Akash Pandit
+## Akash Pandit
+
+Full Stack MERN Developer

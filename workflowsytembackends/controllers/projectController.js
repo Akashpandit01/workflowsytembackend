@@ -164,3 +164,136 @@ async (req, res) => {
     })
   }
 }
+
+exports.simulateExecution =
+async (req, res) => {
+
+  try {
+
+    const {
+      availableHours
+    } = req.body
+
+    const tasks =
+      await Task.find({
+
+        projectId:
+          req.params.projectId
+
+      }).populate(
+        "dependencies"
+      )
+
+    const pendingTasks =
+      tasks.filter(
+        task =>
+          task.status !==
+          "Completed"
+      )
+
+    pendingTasks.sort(
+      (a, b) => {
+
+        if (
+          b.priority !==
+          a.priority
+        ) {
+
+          return (
+            b.priority -
+            a.priority
+          )
+        }
+
+        return (
+          a.estimatedHours -
+          b.estimatedHours
+        )
+      }
+    )
+
+    let usedHours = 0
+
+    let totalPriority = 0
+
+    const selectedTasks = []
+
+    const skippedTasks = []
+
+    const blockedTasks = []
+
+    for (
+      const task
+      of pendingTasks
+    ) {
+
+      const incompleteDependency =
+        task.dependencies.find(
+          dep =>
+            dep.status !==
+            "Completed"
+        )
+
+      if (
+        incompleteDependency
+      ) {
+
+        blockedTasks.push(
+          task
+        )
+
+        continue
+      }
+
+      if (
+
+        usedHours +
+        task.estimatedHours <=
+        availableHours
+
+      ) {
+
+        selectedTasks.push(
+          task
+        )
+
+        usedHours +=
+          task.estimatedHours
+
+        totalPriority +=
+          task.priority
+
+      } else {
+
+        skippedTasks.push(
+          task
+        )
+      }
+    }
+
+    res.json({
+
+      selectedTasks,
+
+      skippedTasks,
+
+      blockedTasks,
+
+      totalPriority,
+
+      usedHours,
+
+      remainingHours:
+        availableHours -
+        usedHours
+    })
+
+  } catch (error) {
+
+    res.status(500).json({
+
+      message:
+        error.message
+    })
+  }
+}

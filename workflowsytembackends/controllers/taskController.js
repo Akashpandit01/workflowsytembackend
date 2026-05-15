@@ -99,10 +99,9 @@ exports.updateTask = async (
 
   try {
 
-    const task =
-      await Task.findById(
-        req.params.id
-      )
+    const task = await Task.findById(
+  req.params.id
+).populate("dependencies")
 
     if (!task) {
 

@@ -1,5 +1,7 @@
 const Task = require("../models/Task")
-const Project = require("../models/Project")
+
+const Project =
+  require("../models/Project")
 
 const hasCycle =
   require("../utils/cycleDetection")
@@ -22,16 +24,32 @@ exports.createTask = async (
 
   try {
 
+    // create task
+
+    const createdTask =
+      await Task.create(
+        req.body
+      )
+
+    // populate dependencies
+
     const task =
-      await Task.create(req.body)
+      await Task.findById(
+        createdTask._id
+      ).populate(
+        "dependencies"
+      )
 
     // cycle detection
 
-    const tasks = await Task.find({
-      projectId: req.body.projectId
-    })
+    const tasks =
+      await Task.find({
+        projectId:
+          req.body.projectId
+      })
 
-    const cycle = hasCycle(tasks)
+    const cycle =
+      hasCycle(tasks)
 
     if (cycle) {
 
@@ -58,7 +76,8 @@ exports.createTask = async (
   } catch (error) {
 
     res.status(500).json({
-      message: error.message
+      message:
+        error.message
     })
   }
 }
@@ -74,16 +93,21 @@ exports.getTasks = async (
 
   try {
 
-    const tasks = await Task.find({
-      projectId: req.params.projectId
-    }).populate("dependencies")
+    const tasks =
+      await Task.find({
+        projectId:
+          req.params.projectId
+      }).populate(
+        "dependencies"
+      )
 
     res.json(tasks)
 
   } catch (error) {
 
     res.status(500).json({
-      message: error.message
+      message:
+        error.message
     })
   }
 }
@@ -99,14 +123,18 @@ exports.updateTask = async (
 
   try {
 
-    const task = await Task.findById(
-  req.params.id
-).populate("dependencies")
+    const task =
+      await Task.findById(
+        req.params.id
+      ).populate(
+        "dependencies"
+      )
 
     if (!task) {
 
       return res.status(404).json({
-        message: "Task not found"
+        message:
+          "Task not found"
       })
     }
 
@@ -120,6 +148,7 @@ exports.updateTask = async (
       return res.status(409).json({
         message:
           "Version conflict",
+
         latest: task
       })
     }
@@ -127,17 +156,23 @@ exports.updateTask = async (
     // resource locking
 
     if (
-      req.body.status === "Running"
+      req.body.status ===
+      "Running"
     ) {
 
       const runningTask =
         await Task.findOne({
+
           _id: {
-            $ne: task._id
+            $ne:
+              task._id
           },
+
           resourceTag:
             task.resourceTag,
-          status: "Running"
+
+          status:
+            "Running"
         })
 
       if (runningTask) {
@@ -152,9 +187,13 @@ exports.updateTask = async (
 
       const dependencyTasks =
         await Task.find({
+
           _id: {
             $in:
-              task.dependencies
+              task.dependencies.map(
+                dep =>
+                  dep._id || dep
+              )
           }
         })
 
@@ -176,15 +215,21 @@ exports.updateTask = async (
       }
     }
 
-    // save old version in history
+    // save history
 
     task.history.push({
-      title: task.title,
+
+      title:
+        task.title,
+
       description:
         task.description,
+
       versionNumber:
         task.versionNumber,
-      updatedAt: new Date()
+
+      updatedAt:
+        new Date()
     })
 
     // update task
@@ -200,12 +245,13 @@ exports.updateTask = async (
 
     await task.save()
 
-    // cycle validation after update
+    // cycle detection
 
-    const tasks = await Task.find({
-      projectId:
-        task.projectId
-    })
+    const tasks =
+      await Task.find({
+        projectId:
+          task.projectId
+      })
 
     const cycle =
       hasCycle(tasks)
@@ -218,24 +264,33 @@ exports.updateTask = async (
       })
     }
 
+    // populate updated task
+
+    const updatedTask =
+      await Task.findById(
+        task._id
+      ).populate(
+        "dependencies"
+      )
+
     // realtime event
 
     emitEvent(
       task.projectId.toString(),
       "task-updated",
-      task
+      updatedTask
     )
 
     // webhook trigger
 
     if (
-      task.status ===
+      updatedTask.status ===
       "Completed"
     ) {
 
       const project =
         await Project.findById(
-          task.projectId
+          updatedTask.projectId
         )
 
       await triggerWebhook(
@@ -243,18 +298,23 @@ exports.updateTask = async (
         {
           event:
             "TASK_COMPLETED",
-          taskId: task._id,
-          title: task.title
+
+          taskId:
+            updatedTask._id,
+
+          title:
+            updatedTask.title
         }
       )
     }
 
-    res.json(task)
+    res.json(updatedTask)
 
   } catch (error) {
 
     res.status(500).json({
-      message: error.message
+      message:
+        error.message
     })
   }
 }
@@ -278,7 +338,8 @@ exports.retryTask = async (
     if (!task) {
 
       return res.status(404).json({
-        message: "Task not found"
+        message:
+          "Task not found"
       })
     }
 
@@ -295,7 +356,8 @@ exports.retryTask = async (
 
     task.retryCount += 1
 
-    task.status = "Pending"
+    task.status =
+      "Pending"
 
     await task.save()
 
@@ -312,7 +374,8 @@ exports.retryTask = async (
   } catch (error) {
 
     res.status(500).json({
-      message: error.message
+      message:
+        error.message
     })
   }
 }
@@ -322,7 +385,10 @@ exports.retryTask = async (
 // ==============================
 
 exports.getTaskHistory =
-async (req, res) => {
+async (
+  req,
+  res
+) => {
 
   try {
 
@@ -334,16 +400,20 @@ async (req, res) => {
     if (!task) {
 
       return res.status(404).json({
-        message: "Task not found"
+        message:
+          "Task not found"
       })
     }
 
-    res.json(task.history)
+    res.json(
+      task.history
+    )
 
   } catch (error) {
 
     res.status(500).json({
-      message: error.message
+      message:
+        error.message
     })
   }
 }

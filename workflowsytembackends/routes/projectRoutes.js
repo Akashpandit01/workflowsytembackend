@@ -10,7 +10,7 @@ const {
   joinProject,
   getProjects,
   computeExecutionPlan,
-  simulateProject
+simulateExecution
 } = require("../controllers/projectController")
 
 router.post("/", authMiddleware, createProject)
@@ -29,8 +29,8 @@ router.post(
 
 router.post(
   "/:projectId/simulate",
-  authMiddleware,
-  simulateProject
+  protect,
+  simulateExecution
 )
 
 module.exports = router

@@ -29,7 +29,7 @@ router.post(
 
 router.post(
   "/:projectId/simulate",
-  protect,
+  authMiddleware,
   simulateExecution
 )
 
